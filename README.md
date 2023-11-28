@@ -15,7 +15,7 @@ This Discord bot, developed by Team MPZ, provides various fun and utility comman
 
 ## Usage
 
-1. Run the bot by executing `node bot.js` in the terminal.
+1. Run the bot by executing `node index.js` in the terminal.
 2. Use commands in a Discord server by prefixing them with `!`.
 
 ## Available Commands
