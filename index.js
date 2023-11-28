@@ -90,7 +90,8 @@ client.on("messageCreate", async (message) => {
         "!userinfo - Get your Discord user info\n" +
         "!meme - Get a random meme\n" +
         "!weather [city] - Get the weather for a city\n" +
-        "!greet - Greet the bot"
+        "!greet - Greet the bot\n" +
+        "!joke - Get a random joke"
     );
   } else if (command === "joke") {
     try {
