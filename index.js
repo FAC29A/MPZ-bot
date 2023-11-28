@@ -81,6 +81,28 @@ client.on("messageCreate", async (message) => {
     message.mentions.users.has(client.user.id)
   ) {
     message.channel.send(`Hello ${message.author.username}!`)
+  } else if (command === "help") {
+    message.channel.send(
+      "Available commands:\n" +
+        "!gif - Get a random GIF\n" +
+        "!ping - Pong!\n" +
+        "!echo [message] - Echo a message\n" +
+        "!userinfo - Get your Discord user info\n" +
+        "!meme - Get a random meme\n" +
+        "!weather [city] - Get the weather for a city\n" +
+        "!greet - Greet the bot\n" +
+        "!joke - Get a random joke"
+    );
+  } else if (command === "joke") {
+    try {
+      const response = await axios.get("https://official-joke-api.appspot.com/random_joke");
+      const joke = `${response.data.setup}\n${response.data.punchline}`;
+      console.log(joke)
+      message.channel.send(joke);
+    } catch (error) {
+      console.error(error);
+      message.channel.send("Failed to retrieve a joke.");
+    }
   }
 
   // more features
