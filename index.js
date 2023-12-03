@@ -1,13 +1,9 @@
-// Load environment variables from .env file
+const { Client, GatewayIntentBits, Collection } = require("discord.js");
+const fs = require("fs");
+const { REST } = require("@discordjs/rest");
+const { Routes } = require("discord-api-types/v9");
 require("dotenv").config();
 
-// Import axios for HTTP requests
-const axios = require("axios");
-
-// Import necessary discord.js classes
-const { Client, GatewayIntentBits } = require("discord.js");
-
-// Create a new client instance with the required intents
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -18,126 +14,102 @@ const client = new Client({
   ],
 });
 
-// Command prefix
-const commandPrefix = "!";
+// slash commands
+client.commands = new Collection();
+const commands = [];
+const commandFiles = fs
+  .readdirSync("./commands")
+  .filter((file) => file.endsWith(".js"));
 
-// Environment Variables
-const giphyApiKey = process.env.GIPHY_API_KEY;
-const weatherApiKey = process.env.WEATHER_API_KEY;
-const memeApiUrl = "https://api.imgflip.com/get_memes";
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.data.name, command);
+  commands.push(command.data.toJSON());
+}
 
-client.once("ready", () => {
-  console.log("Team MPZ is ready!");
+const rest = new REST({ version: "9" }).setToken(process.env.DISCORD_TOKEN);
+
+client.once("ready", async () => {
+  console.log(`Logged in as ${client.user.tag}!`);
+  console.log("Team MPZ-Bot is ready!");
+
+  try {
+    console.log("Started refreshing application (/) commands.");
+
+    await rest.put(Routes.applicationCommands(client.user.id), {
+      body: commands,
+    });
+
+    console.log("Successfully reloaded application (/) commands.");
+  } catch (error) {
+    console.error(error);
+  }
 });
+
+
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isCommand()) return;
+
+  const command = client.commands.get(interaction.commandName);
+
+  if (!command) return;
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    await interaction.reply({
+      content: "There was an error while executing this command!",
+      ephemeral: true,
+    });
+  }
+});
+
+
 
 client.on("messageCreate", async (message) => {
+  console.log(`Received message: ${message.content}`);
   if (message.author.bot) return;
-  if (!message.content.startsWith(commandPrefix)) return;
 
-  const args = message.content.slice(commandPrefix.length).trim().split(/ +/);
-  const command = args.shift().toLowerCase();
+  // direct messages
+  if (message.channel.type === "DM") {
+    console.log("Handling a DM"); 
+    handleDirectMessage(message);
+    return;
+  }
 
-  // Object to map commands to handlers
-  const commands = {
-    gif: () => handleGif(message),
-    ping: () => message.channel.send("Pong!"),
-    echo: () => handleEcho(args, message),
-    userinfo: () => handleUserinfo(message),
-    meme: () => handleMeme(message),
-    weather: () => handleWeather(args, message),
-    greet: () => message.channel.send(`Hello ${message.author.username}!`),
-    help: () => handleHelp(message),
-    joke: () => handleJoke(message),
-  };
-
-  const commandFunction = commands[command];
-  if (commandFunction) {
-    commandFunction();
+  // mentions
+  if (message.mentions.users.has(client.user.id)) {
+    console.log("Bot was mentioned");
+    handleMentions(message);
+    return;
   }
 });
 
-// Command Handlers
-async function handleGif(message) {
+async function handleMentions(message) {
+  console.log("Responding to a mention");
+  // Respond to mention here
+  message.channel.send("**Hello! How can I assist you today?**");
+
+  // Logging mention
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    author: message.author.tag,
+    messageContent: message.content,
+    channel: message.channel.name,
+  };
+  console.log("Mention Log:", logEntry);
+  // save this log to database ??
+}
+
+async function handleDirectMessage(message) {
   try {
-    const response = await axios.get(`http://api.giphy.com/v1/gifs/random?api_key=${process.env.GIPHY_API_KEY}`);
-    const gifUrl = response.data.data.images.original.url;
-    await message.channel.send({ files: [gifUrl] });
+    console.log("Responding to DM"); // debugging log
+    await message.author.send("Hello! How can I help you in DM?");
   } catch (error) {
-    console.error("Error fetching GIF:", error);
-    await message.channel.send("Failed to retrieve a GIF.");
+    console.error("Error in handleDirectMessage:", error);
   }
 }
 
-function handleEcho(args, message) {
-  const echoMessage = args.join(" ");
-  if (!echoMessage) {
-    message.channel.send("Please provide a message to echo.");
-  } else {
-    message.channel.send(echoMessage);
-  }
-}
-
-function handleUserinfo(message) {
-  message.channel.send(`Your username: ${message.author.username}\nYour ID: ${message.author.id}`);
-}
-
-async function handleMeme(message) {
-  try {
-    const response = await axios.get(memeApiUrl);
-    const memes = response.data.data.memes;
-    const randomMeme = memes[Math.floor(Math.random() * memes.length)];
-    await message.channel.send({ files: [randomMeme.url] });
-  } catch (error) {
-    console.error("Error fetching meme:", error);
-    await message.channel.send("Failed to retrieve a meme.");
-  }
-}
-
-async function handleWeather(args, message) {
-  if (args.length === 0) {
-    message.channel.send("Please provide a city name. e.g., !weather London");
-  } else {
-    const city = args.join(" ");
-    try {
-      const response = await axios.get(
-        `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.WEATHER_API_KEY}&units=metric`
-      );
-      const weatherData = response.data;
-      await message.channel.send(
-        `Weather in ${city}: ${weatherData.main.temp}°C, ${weatherData.weather[0].description}`
-      );
-    } catch (error) {
-      console.error("Error fetching weather:", error);
-      await message.channel.send(`Could not retrieve weather for ${city}.`);
-    }
-  }
-}
-
-function handleHelp(message) {
-  const helpMessage =
-    "Available commands:\n" +
-    "!gif - Get a random GIF\n" +
-    "!ping - Pong!\n" +
-    "!echo [message] - Echo a message\n" +
-    "!userinfo - Get your Discord user info\n" +
-    "!meme - Get a random meme\n" +
-    "!weather [city] - Get the weather for a city\n" +
-    "!greet - Greet the bot\n" +
-    "!joke - Get a random joke";
-  message.channel.send(helpMessage);
-}
-
-async function handleJoke(message) {
-  try {
-    const response = await axios.get(
-      "https://official-joke-api.appspot.com/random_joke"
-    );
-    const joke = `${response.data.setup}\n${response.data.punchline}`;
-    message.channel.send(joke);
-  } catch (error) {
-    console.error("Error fetching joke:", error);
-    await message.channel.send("Failed to retrieve a joke.");
-  }
-}
 
 client.login(process.env.DISCORD_TOKEN);
