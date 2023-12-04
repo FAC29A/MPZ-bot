@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("help")
-    .setDescription("List all commands or info about a specific command"),
+    .setDescription("List all commands or info about a specific command 📝"),
   async execute(interaction) {
     let helpMessage = "Available Commands:\n";
     interaction.client.commands.forEach((cmd) => {

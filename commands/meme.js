@@ -4,7 +4,7 @@ const axios = require("axios");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("meme")
-    .setDescription("Get a random meme"),
+    .setDescription("Get a random meme 🤭"),
   async execute(interaction) {
     try {
       const response = await axios.get(process.env.MEME_API_URL);

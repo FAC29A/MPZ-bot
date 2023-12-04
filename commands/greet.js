@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("greet")
-    .setDescription("Greets the user"),
+    .setDescription("Greets the user 👋"),
   async execute(interaction) {
     // Use interaction.member.displayName if available, otherwise fall back to interaction.user.username
     const displayName = interaction.member

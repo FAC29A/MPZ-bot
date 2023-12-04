@@ -4,7 +4,7 @@ const axios = require("axios");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("weather")
-    .setDescription("Get weather for a city")
+    .setDescription("Get weather for a city 🌦")
     .addStringOption((option) =>
       option
         .setName("city")

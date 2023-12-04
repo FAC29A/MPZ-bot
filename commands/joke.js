@@ -4,7 +4,7 @@ const axios = require("axios");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("joke")
-    .setDescription("Get a random joke"),
+    .setDescription("Get a random joke 😝"),
   async execute(interaction) {
     try {
       const response = await axios.get(
