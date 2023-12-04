@@ -5,7 +5,7 @@ module.exports = {
     .setName("help")
     .setDescription("List all commands or info about a specific command 📝"),
   async execute(interaction) {
-    let helpMessage = "Available Commands:\n";
+    let helpMessage = "**Available Commands:**\n\n";
     interaction.client.commands.forEach((cmd) => {
       let commandUsage = `/${cmd.data.name}`;
 
