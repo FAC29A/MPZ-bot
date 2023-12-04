@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("echo")
-    .setDescription("Echoes your message")
+    .setDescription("Echoes your message 💬")
     .addStringOption((option) =>
       option
         .setName("message")

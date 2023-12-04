@@ -4,7 +4,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("guess")
-    .setDescription("Start a guessing game")
+    .setDescription("Guess a number between 1 and 10 🧐")
     .addIntegerOption((option) =>
       option
         .setName("number")
