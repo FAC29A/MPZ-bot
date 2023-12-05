@@ -1,8 +1,10 @@
+require("dotenv").config();
+
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const fs = require("fs");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
-require("dotenv").config();
+const axios = require("axios");
 
 const client = new Client({
   intents: [
@@ -11,6 +13,7 @@ const client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.DirectMessages,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildVoiceStates,
   ],
 });
 
@@ -46,7 +49,6 @@ client.once("ready", async () => {
   }
 });
 
-
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
 
@@ -65,51 +67,82 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-
-
 client.on("messageCreate", async (message) => {
-  console.log(`Received message: ${message.content}`);
+  // ignore messages from bots
   if (message.author.bot) return;
 
-  // direct messages
-  if (message.channel.type === "DM") {
-    console.log("Handling a DM"); 
-    handleDirectMessage(message);
-    return;
-  }
+  // check if the message is DM or mentions the bot in a server
+  if (message.channel.type === "DM" || message.mentions.has(client.user.id)) {
+    let content = message.content;
 
-  // mentions
-  if (message.mentions.users.has(client.user.id)) {
-    console.log("Bot was mentioned");
-    handleMentions(message);
-    return;
+    // if the message is in server and mentions the bot, remove the mention from the message
+    if (message.channel.type !== "DM") {
+      content = content
+        .replace(new RegExp(`<@!?${client.user.id}>`, "g"), "")
+        .trim();
+    }
+
+    // generate and send a response using OpenAI API
+    try {
+      const reply = await generateOpenAIResponse(content);
+      await message.channel.send(reply);
+    } catch (error) {
+      console.error(
+        "Error in sending DM or processing OpenAI response:",
+        error
+      );
+      // inform the user that an error occurred (optional)
+      if (message.channel.type === "DM") {
+        await message.author.send(
+          "I encountered an error while processing your request."
+        );
+      }
+    }
   }
 });
 
-async function handleMentions(message) {
-  console.log("Responding to a mention");
-  // Respond to mention here
-  message.channel.send("**Hello! How can I assist you today?**");
+// function to generate responses using OpenAI
+async function generateOpenAIResponse(userMessage) {
+  const conversationHistory = [
+    { role: "system", content: "You are a helpful assistant." },
+    { role: "user", content: userMessage },
+  ];
 
-  // Logging mention
-  const logEntry = {
-    timestamp: new Date().toISOString(),
-    author: message.author.tag,
-    messageContent: message.content,
-    channel: message.channel.name,
-  };
-  console.log("Mention Log:", logEntry);
-  // save this log to database ??
-}
-
-async function handleDirectMessage(message) {
   try {
-    console.log("Responding to DM"); // debugging log
-    await message.author.send("Hello! How can I help you in DM?");
+    const response = await axios.post(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        model: "gpt-3.5-turbo",
+        messages: conversationHistory,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+      }
+    );
+
+    console.log("OpenAI API Response:", response.data);
+
+    if (
+      response.data &&
+      response.data.choices &&
+      response.data.choices[0] &&
+      response.data.choices[0].message &&
+      response.data.choices[0].message.content
+    ) {
+      const generatedReply = response.data.choices[0].message.content;
+      console.log("Generated Reply:", generatedReply);
+      return generatedReply;
+    } else {
+      console.error("Invalid response from OpenAI API");
+      return "Failed to generate a response.";
+    }
   } catch (error) {
-    console.error("Error in handleDirectMessage:", error);
+    console.error("Error generating response:", error.message);
+    return "Failed to generate a response.";
   }
 }
-
 
 client.login(process.env.DISCORD_TOKEN);

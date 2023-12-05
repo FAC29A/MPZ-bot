@@ -16,34 +16,50 @@ module.exports = {
     // decode HTML entities
     const decodedQuestion = he.decode(triviaData.question);
 
-    // defer the reply
-    await interaction.deferReply();
-
     // send the question
-    await interaction.editReply(
+    await interaction.reply(
       `**Question:** ${decodedQuestion}\n*Answer in the next message.*`
     );
 
-    // await response from user
-    const filter = (m) => m.author.id === interaction.user.id;
-    try {
-      const collected = await interaction.channel.awaitMessages({
-        filter,
-        max: 1,
-        time: 30000,
-      });
-      const answer = collected.first().content;
+    // check if interaction is in DM
+    const isDM =
+      interaction.channel === null || interaction.channel.type === "DM";
 
-      // check the answer
-      if (answer.toLowerCase() === triviaData.correct_answer.toLowerCase()) {
-        await interaction.followUp("Correct answer!");
+    // create a filter for messages
+    const filter = (m) => m.author.id === interaction.user.id;
+
+    // define collector for answer
+    let collector;
+    if (isDM) {
+      // in DMs, use the DM channel to create a collector
+      collector = (await interaction.user.createDM()).createMessageCollector({
+        filter,
+        time: 30000,
+        max: 1,
+      });
+    } else {
+      // in guilds, use the channel where the command was executed
+      collector = interaction.channel.createMessageCollector({
+        filter,
+        time: 30000,
+        max: 1,
+      });
+    }
+
+    collector.on("collect", (m) => {
+      if (m.content.toLowerCase() === triviaData.correct_answer.toLowerCase()) {
+        interaction.followUp("Correct answer!");
       } else {
-        await interaction.followUp(
+        interaction.followUp(
           `Oops, the correct answer was: ${triviaData.correct_answer}`
         );
       }
-    } catch (error) {
-      await interaction.followUp("You did not answer in time.");
-    }
+    });
+
+    collector.on("end", (collected) => {
+      if (collected.size === 0) {
+        interaction.followUp("You did not answer in time.");
+      }
+    });
   },
 };
