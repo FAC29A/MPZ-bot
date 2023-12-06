@@ -1,46 +1,87 @@
 # Team MPZ Discord Bot
 
-## Overview
 
-This Discord bot, developed by Team MPZ, provides various fun and utility commands for users in a Discord server. The bot can fetch GIFs, memes, weather information, jokes, and more. It is designed to be interactive and responsive to user commands.
+<div>
+<img width="300" src="images/MPZ.png">
+<img width="200" src="images/about.png">
+</div>
+
+## Overview
+Hello Everyone, I'm your friendly neighborhood MPZbot! Nice to meet you 👋
+- Developed by Team MPZ (Marika, Paing & Zukhra from [FAC29A](https://github.com/FAC29A)), I provide various fun and utility commands for Discord server users.
+- I can fetch GIFs, memes, weather information, jokes, and more and am designed to be interactive and responsive.
 
 ## Getting Started
 
 1. Clone this repository to your local machine.
-2. Install dependencies by running `npm install`.
-3. Create a `.env` file in the project root and add the following environment variables:
-   - `GIPHY_API_KEY`: API key for Giphy.
-   - `WEATHER_API_KEY`: API key for OpenWeatherMap.
-   - `DISCORD_TOKEN`: Discord bot token.
+```bash
+git clone https://github.com/FAC29A/MPZ-bot.git
+```
+2. Navigate to the bot directory:
+``` bash
+cd MPZ-bot
+```
+3. Install dependencies by running:
+``` bash
+npm install
+```
+4. Create a `.env` file in the project root and add your API keys and Discord token:
+``` bash
+DISCORD_TOKEN=your_discord_bot_token
+OPENAI_API_KEY=your_openai_api_key
+GIPHY_API_KEY=your_giphy_api_key
+WEATHER_API_KEY=your_openweathermap_api_key
+MEME_API_URL=https://api.imgflip.com/get_memes
+```
 
 ## Usage
 
-1. Run the bot by executing `node index.js` in the terminal.
-2. Use commands in a Discord server by prefixing them with `!`.
+Run the bot with:
+```bash
+node index.js
+````
+Or use:
+```bash
+npm run dev
+```
+for development mode with hot reloading.
 
 ## Available Commands
 
-- `!gif`: Get a random GIF.
-- `!ping`: Pong!
-- `!echo [message]`: Echo a message.
-- `!userinfo`: Get your Discord user info.
-- `!meme`: Get a random meme.
-- `!weather [city]`: Get the weather for a city.
-- `!greet`: Greet the bot.
-- `!joke`: Get a random joke.
-- `!help`: Display a list of available commands.
+
+- `/echo [message]`: Echoes your message 💬
+- `/gif [term]`: Get a random GIF or search a specific term 🔎
+- `/greet`: Greets the user 👋
+- `/guess [number]`: Guess a number between 1 and 10 🧐
+- `/help`: List all commands or info about a specific command 📝
+- `/joke`: Get a random joke 😂
+- `/meme`: Get a random meme 🤭
+- `/ping`: Responds with Pong! 🏓
+- `/play [song] [url]`: Play a song from YouTube 📺
+- `/trivia`: Starts a trivia question 🤔
+- `/userinfo`: Get your Discord user info ℹ️
+- `/weather [city]`: Get the weather for a city 🌦
+  
+📌 Note: I can assist with general queries using OpenAI integration in the server channels. DM assistance is currently under improvement.
+
+<img width="500" src="images/commands.png">
 
 ## Implementation Details
 
 - The bot uses the Discord.js library for interacting with the Discord API.
 - It fetches data from Giphy, Imgflip (for memes), OpenWeatherMap, and an official joke API.
+- Last but not least, openAI.
 - The bot responds to specific commands triggered by the user in the Discord server.
-
+  
 ## Contributors
 
 This project was developed as part of a collaborative effort by Team MPZ:
-- Paing
-- Marika 
-- Zukhra.
-
-
+- [Marika](https://github.com/MarikaBBB)
+- [Paing](https://github.com/Paing-Ko)
+- [Zukhra](https://github.com/Zu18)
+  
+<div>
+<img width="300" src="images/tests3.png">
+<img width="300" src="images/tests1.png">
+<img width="300" src="images/tests2.png">
+</div>
