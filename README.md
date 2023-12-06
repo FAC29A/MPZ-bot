@@ -2,8 +2,8 @@
 
 
 <div>
-<img width="300" src="images/MPZ.png">
-<img width="200" src="images/about.png">
+<img width="350" src="images/MPZ.png">
+<img width="250" src="images/about.png">
 </div>
 
 ## Overview
@@ -64,7 +64,7 @@ for development mode with hot reloading.
   
 📌 Note: I can assist with general queries using OpenAI integration in the server channels by mentioning me as `@MPZ`. DM assistance is currently under improvement.
 
-<img width="500" src="images/commands.png">
+<img width="600" src="images/commands.png">
 
 ## Implementation Details
 
@@ -80,8 +80,6 @@ This project was developed as part of a collaborative effort by Team MPZ:
 - [Paing](https://github.com/Paing-Ko)
 - [Zukhra](https://github.com/Zu18)
   
-<div>
-<img width="300" src="images/tests3.png">
-<img width="300" src="images/tests1.png">
-<img width="300" src="images/tests2.png">
-</div>
+<img width="500" src="images/tests3.png">
+<img width="500" src="images/tests1.png">
+<img width="500" src="images/tests2.png">
