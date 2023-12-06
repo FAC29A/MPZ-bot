@@ -62,7 +62,7 @@ for development mode with hot reloading.
 - `/userinfo`: Get your Discord user info ℹ️
 - `/weather [city]`: Get the weather for a city 🌦
   
-📌 Note: I can assist with general queries using OpenAI integration in the server channels. DM assistance is currently under improvement.
+📌 Note: I can assist with general queries using OpenAI integration in the server channels by mentioning me as `@MPZ`. DM assistance is currently under improvement.
 
 <img width="500" src="images/commands.png">
 
